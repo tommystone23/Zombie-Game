@@ -96,21 +96,42 @@ void MainGame::init_shaders()
 
 void MainGame::game_loop()
 {
+    const float DESIRED_FPS = 60.0f;
+    const int MAX_PHYSICS_STEPS = 6;
+    const float MAX_DELTA_TIME = 1.0f;
 
     FPSLimiter fps;
     // Set max fps
-    fps.init(60.0f);
+    fps.init(DESIRED_FPS);
+
+    const float MS_PER_SECOND = 1000;
+    const float DESIRED_FRAME_TIME = MS_PER_SECOND / DESIRED_FPS;
+
+    float previous_ticks = SDL_GetTicks64();
 
     while(_game_state == GameState::PLAY)
     {
+        float new_ticks = SDL_GetTicks64();
+        float frame_time = SDL_GetTicks64() - previous_ticks;
+        previous_ticks = new_ticks;
+
+        float total_delta_time  = frame_time / DESIRED_FRAME_TIME;
+
         fps.begin();
 
         process_input();
 
-        update_entities();
-
-        // Update bullets
-        update_bullets();
+        /*
+            Go through each time step and do physics calculations based
+            on steps so changes in FPS will not affect collision and other physics.
+        */
+        int i = 0;
+        while(total_delta_time > 0.0f  && i++ < MAX_PHYSICS_STEPS) {
+            float delta_time = std::min(total_delta_time, MAX_DELTA_TIME);
+            update_entities(delta_time);
+            update_bullets(delta_time);
+            total_delta_time -= delta_time;
+        }
 
         _camera.set_position(_player->get_position());
         _camera.update();
@@ -120,17 +141,17 @@ void MainGame::game_loop()
     }
 }
 
-void MainGame::update_entities()
+void MainGame::update_entities(float delta_time)
 {
     // Update humans
     for(int i = 0; i < _humans.size(); i++)
     {
-        _humans[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies);
+        _humans[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time);
     }
     // Update zombies
     for(int i = 0; i < _zombies.size(); i++)
     {
-        _zombies[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies);
+        _zombies[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time);
     }
 
     // Update human collisions
@@ -173,13 +194,13 @@ void MainGame::update_entities()
     }
 }
 
-void MainGame::update_bullets()
+void MainGame::update_bullets(float delta_time)
 {
     // Collide with world
     for(int i = 0; i < _bullets.size();)
     {
         // If true. collided with wall
-        if(_bullets[i].update(_levels[_cur_level]->get_level_data()))
+        if(_bullets[i].update(_levels[_cur_level]->get_level_data(), delta_time))
         {
             _bullets[i] = _bullets.back();
             _bullets.pop_back();

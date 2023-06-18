@@ -18,11 +18,7 @@ void Entity::draw(SpriteBatch &sprite_batch)
     // Texture coords will always be the same.
     const glm::vec4 uv_rect(0.0f, 0.0f, 1.0f, 1.0f);
 
-    glm::vec4 dest_rect;
-    dest_rect.x = _position.x;
-    dest_rect.y = _position.y;
-    dest_rect.z = ENTITY_WIDTH;
-    dest_rect.w = ENTITY_WIDTH;
+    glm::vec4 dest_rect(_position.x, _position.y, ENTITY_WIDTH, ENTITY_WIDTH);
     sprite_batch.draw(dest_rect, uv_rect, texture_id, 0, _color);
 }
 

@@ -14,9 +14,9 @@ Bullet::~Bullet()
 {
 }
 
-bool Bullet::update(const std::vector<std::string> &level_data)
+bool Bullet::update(const std::vector<std::string> &level_data, float delta_time)
 {
-    _position += _direction * _speed;
+    _position += _direction * _speed * delta_time;
     return handle_wall_collision(level_data);
 }
 
@@ -26,11 +26,7 @@ void Bullet::draw(SpriteBatch &sprite_batch)
     glm::vec4 dest_rect(_position.x + BULLET_RADIUS, _position.y + BULLET_RADIUS,
                         BULLET_RADIUS * 2, BULLET_RADIUS * 2);
     const glm::vec4 uv_rect(0.0f, 0.0f, 1.0f, 1.0f);
-    Color color;
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = 255;
+    Color color = { 0, 0, 0, 255 };
 
     sprite_batch.draw(dest_rect, uv_rect, texture_id, 0.0f, color);
 }

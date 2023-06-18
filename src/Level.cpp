@@ -29,11 +29,7 @@ Level::Level(const std::string &file_name)
 
     // Same texture coords for all tectures
     glm::vec4 uv_rect(0.0f, 0.0f, 1.0f, 1.0f);
-    Color color;
-    color.r = 255;
-    color.g = 255;
-    color.b = 255;
-    color.a = 255;
+    Color color = { 255, 255, 255, 255};
 
     for(int y = 0; y < _level_data.size();y++)
     {

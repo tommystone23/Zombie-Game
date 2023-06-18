@@ -21,23 +21,21 @@ void Player::init(int speed, glm::vec2 position, InputManager *input_manager, Ca
     _bullets = bullets;
     _health = 150;
 
-    _color.r = 0;
-    _color.g = 0;
-    _color.b = 128;
-    _color.a = 255;
+    _color = { 0, 0, 128, 255 };
 }
 
 void Player::update(const std::vector<std::string> &level_data,
-                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies)
+                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
+                        float delta_time)
 {
     if(_input_manager->is_key_pressed(SDLK_w))
-        _position.y += _speed;
+        _position.y += _speed * delta_time;
     if(_input_manager->is_key_pressed(SDLK_s))
-        _position.y -= _speed;
+        _position.y -= _speed * delta_time;
     if(_input_manager->is_key_pressed(SDLK_a))
-        _position.x -= _speed;
+        _position.x -= _speed * delta_time;
     if(_input_manager->is_key_pressed(SDLK_d))
-        _position.x += _speed;
+        _position.x += _speed * delta_time;
 
     if(_input_manager->is_key_pressed(SDLK_1) && _guns.size() >= 0)
         _cur_gun_index = 0;
@@ -55,7 +53,7 @@ void Player::update(const std::vector<std::string> &level_data,
         _guns[_cur_gun_index]->update(_input_manager->is_key_pressed(SDL_BUTTON_LEFT),
                                         player_center_position, 
                                         direction,
-                                        *_bullets);
+                                        *_bullets, delta_time);
     }
     
 

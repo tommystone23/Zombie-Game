@@ -19,9 +19,11 @@ Gun::~Gun()
 {
 }
 
-void Gun::update(bool is_mouse_pressed, const glm::vec2& position, const glm::vec2& direction, std::vector<Bullet> &bullets)
+void Gun::update(bool is_mouse_pressed, const glm::vec2& position, 
+                const glm::vec2& direction, std::vector<Bullet> &bullets,
+                float delta_time)
 {
-    _frame_counter++;
+    _frame_counter += 1.0f * delta_time;
     if(_frame_counter >= _fire_rate && is_mouse_pressed) 
     {
         fire(direction, position, bullets);

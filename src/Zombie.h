@@ -14,7 +14,8 @@ public:
     void init(float speed, glm::vec2 position);
 
     virtual void update(const std::vector<std::string> &level_data,
-                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies);
+                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
+                        float delta_time) override;
 
 private:
     Human* get_nearest_human(std::vector<Human*>& humans);

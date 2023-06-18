@@ -35,9 +35,9 @@ private:
     // Main game loop
     void game_loop();
     // Update all entities
-    void update_entities();
+    void update_entities(float delta_time);
     // Update all bullets
-    void update_bullets();
+    void update_bullets(float delta_time);
     // Get user input
     void process_input();
     // Draw graphics to the screen

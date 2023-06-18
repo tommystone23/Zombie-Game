@@ -16,10 +16,7 @@ void Human::init(float speed, glm::vec2 position)
     static std::mt19937 random_engine(time(nullptr));
     static std::uniform_real_distribution<float> random_direction(-1.0f, 1.0f);
 
-    _color.r = 200;
-    _color.g = 0;
-    _color.b = 200;
-    _color.a = 255;
+    _color = { 200, 0, 200, 255 };
 
     _health = 20;
     _speed = speed;
@@ -32,7 +29,8 @@ void Human::init(float speed, glm::vec2 position)
 }
 
 void Human::update(const std::vector<std::string> &level_data,
-                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies)
+                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
+                        float delta_time)
 {
     static std::mt19937 random_engine(time(nullptr));
     static std::uniform_real_distribution<float> random_rotate(-1.0f, 1.0f);

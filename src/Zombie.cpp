@@ -13,10 +13,7 @@ Zombie::~Zombie()
 
 void Zombie::init(float speed, glm::vec2 position)
 {
-    _color.r = 0;
-    _color.g = 160;
-    _color.b = 0;
-    _color.a = 255;
+    _color = { 0, 100, 160, 255 };
 
     _health = 150;
     _speed = speed;
@@ -24,13 +21,14 @@ void Zombie::init(float speed, glm::vec2 position)
 }
 
 void Zombie::update(const std::vector<std::string> &level_data,
-                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies)
+                        std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
+                        float delta_time)
 {
     Human* nearest_human = get_nearest_human(humans);
     if(nearest_human != nullptr)
     {
         glm::vec2 direction = glm::normalize(nearest_human->get_position() - _position);
-        _position += direction * _speed;
+        _position += direction * _speed * delta_time;
     }
 
     // Rotate entity if collides with wall
