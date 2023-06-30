@@ -10,6 +10,7 @@
 #include <vector>
 #include "Player.h" 
 #include "Bullet.h"
+#include "Engine/SpriteFont.h"
 
 class Zombie;
 
@@ -42,6 +43,8 @@ private:
     void process_input();
     // Draw graphics to the screen
     void draw_game();
+    // Draws the HUD
+    void draw_hud();
     // Check if player won
     void check_victory();
 
@@ -49,11 +52,19 @@ private:
     int _screen_height;
 
     Window _window;
+
     GLSLProgram _shader_program;
+    GLSLProgram _font_program;
+
     InputManager _input_manager;
+
     Camera2D _camera;
+
     GameState _game_state;
+
     SpriteBatch _sprite_batch;
+    SpriteBatch _hud_sprite_batch;
+    SpriteFont *_sprite_font;
 
     Player *_player;
     std::vector<Level*> _levels;
@@ -61,10 +72,8 @@ private:
     std::vector<Zombie*> _zombies;
     std::vector<Bullet> _bullets;
 
-
     int _fps;
     int _cur_level;
-
 };
 
 #endif

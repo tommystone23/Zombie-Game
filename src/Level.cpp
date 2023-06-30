@@ -29,6 +29,7 @@ Level::Level(const std::string &file_name)
 
     // Same texture coords for all tectures
     glm::vec4 uv_rect(0.0f, 0.0f, 1.0f, 1.0f);
+    //glm::vec4 uv_rect(0.0625f, 0.0625f, 0.9375f, 0.9375f);
     Color color = { 255, 255, 255, 255};
 
     for(int y = 0; y < _level_data.size();y++)
@@ -52,12 +53,15 @@ Level::Level(const std::string &file_name)
                     _level_data[y][x] = '.';
                     _player_start_position.x = x * TILE_WIDTH;
                     _player_start_position.y = y * TILE_WIDTH;
+                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/stone_floor.png").id, 0.0f, color);
                     break;
                 case('Z'):
                     _level_data[y][x] = '.';
                     _zombie_start_positions.emplace_back(x * TILE_WIDTH, y * TILE_WIDTH);
+                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/stone_floor.png").id, 0.0f, color);
                     break;
                 case('.'):
+                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/stone_floor.png").id, 0.0f, color);
                     break;
                 default:
                     std::cout << "Unexpected symbol in level file" << std::endl;

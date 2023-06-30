@@ -5,8 +5,6 @@ in vec2 fragment_uv;
 
 out vec4 final_color;
 
-//uniform float time;
-
 uniform sampler2D texture0;
 
 void main()

@@ -11,8 +11,10 @@
 const float HUMAN_SPEED = 1.0f;
 const float ZOMBIE_SPEED = 1.5f;
 const float PLAYER_SPEED = 3.0f;
+const int FONT_SIZE = 64;
+const float FONT_SCALE = 1.0f;
 
-MainGame::MainGame() : _screen_width(1920), _screen_height(1080), _game_state(GameState::PLAY), _fps(0), _player(NULL)
+MainGame::MainGame() : _screen_width(1920), _screen_height(1080), _game_state(GameState::PLAY), _player(NULL), _fps(0)
 {
 }
 
@@ -28,6 +30,7 @@ MainGame::~MainGame()
         delete human;
     for(auto zombie : _zombies)
         delete zombie;
+    delete _sprite_font;
     _levels.clear();
     _humans.clear();
     _zombies.clear();
@@ -38,8 +41,15 @@ void MainGame::run()
     init_systems();
     init_shaders();
     init_level();
+
     _sprite_batch.init();
+    _hud_sprite_batch.init();
+
+    _sprite_font = new SpriteFont("fonts/OpenSans-Regular.ttf", FONT_SIZE);
+
     _camera.init(_screen_width, _screen_height);
+    _camera.set_scale(1.0f);
+
     glEnable(GL_DEPTH_TEST);
     game_loop();
 }
@@ -92,6 +102,9 @@ void MainGame::init_shaders()
 {
     _shader_program.compile_shaders("shaders/texture_shader.vert", "shaders/texture_shader.frag");
     _shader_program.link_shaders();
+
+    _font_program.compile_shaders("shaders/font_shader.vert", "shaders/font_shader.frag");
+    _font_program.link_shaders();
 }
 
 void MainGame::game_loop()
@@ -314,23 +327,30 @@ void MainGame::draw_game()
     GLint projection_location = _shader_program.get_uniform_location("projection");
     glUniformMatrix4fv(projection_location, 1, GL_FALSE, &projection[0][0]);
 
-    // Draw the level
-    _levels[_cur_level]->draw();
+    draw_hud();
 
     _sprite_batch.begin();
 
+    const glm::vec2 entity_dimensions = glm::vec2(ENTITY_RADIUS * 2);
     // Draw Humans
-    for(int i = 0; i < _humans.size(); i++)
-        _humans[i]->draw(_sprite_batch);
+    for(int i = 0; i < _humans.size(); i++) {
+        if(_camera.is_in_view(_humans[i]->get_position(), entity_dimensions))
+            _humans[i]->draw(_sprite_batch);
+    }
     // Draw zombies
-    for(int i = 0; i < _zombies.size(); i++)
-        _zombies[i]->draw(_sprite_batch);
+    for(int i = 0; i < _zombies.size(); i++) {
+        if(_camera.is_in_view(_zombies[i]->get_position(), entity_dimensions))
+            _zombies[i]->draw(_sprite_batch);
+    }
     // Draw bullets
     for(int i = 0; i < _bullets.size(); i++)
         _bullets[i].draw(_sprite_batch);
 
     _sprite_batch.end();
     _sprite_batch.render_batch();
+
+    // Draw the level
+    _levels[_cur_level]->draw();
 
     _shader_program.unuse();
     _window.swap_buffers();
@@ -343,5 +363,38 @@ void MainGame::check_victory()
         printf("YOU WON");
         _game_state = GameState::EXIT;
     }
+}
 
+void MainGame::draw_hud()
+{
+    static char humans_buffer[256];
+    static char zombies_buffer[256];
+    static char fps_buffer[16];
+    _hud_sprite_batch.begin();
+
+    snprintf(humans_buffer, sizeof(humans_buffer), "Humans: %ld", _humans.size());
+    snprintf(zombies_buffer, sizeof(zombies_buffer), "Zombies: %ld", _zombies.size());
+    snprintf(fps_buffer, sizeof(fps_buffer), "FPS: %d", _fps);
+
+    // Draw relative to camera
+    glm::vec2 camera_pos = _camera.get_position();
+    float camera_scale = _camera.get_scale();
+    
+    // need to shift camera over half of screen width and height and account for scale
+    float offset_height = _screen_height / 2;
+    float offset_width = _screen_width / 2;
+
+    glm::vec2 human_text_pos(camera_pos.x - (offset_width / camera_scale), 
+                    camera_pos.y - ((offset_height / camera_scale) - FONT_SIZE));
+    glm::vec2 zombie_text_pos(human_text_pos.x, human_text_pos.y + (FONT_SIZE * FONT_SCALE));
+    glm::vec2 fps_text_pos(camera_pos.x - (offset_width / camera_scale), 
+                    camera_pos.y + (offset_height / camera_scale) - (FONT_SIZE * FONT_SCALE));
+    
+    Color font_colour = { 0, 0, 0, 255 };
+    _sprite_font->draw(_hud_sprite_batch, humans_buffer, human_text_pos, glm::vec2(FONT_SCALE), 0.0f, font_colour);
+    _sprite_font->draw(_hud_sprite_batch, zombies_buffer, zombie_text_pos, glm::vec2(FONT_SCALE), 0.0f, font_colour);
+    _sprite_font->draw(_hud_sprite_batch, fps_buffer, fps_text_pos, glm::vec2(FONT_SCALE), 0.0f, font_colour);
+
+    _hud_sprite_batch.end();
+    _hud_sprite_batch.render_batch();
 }
