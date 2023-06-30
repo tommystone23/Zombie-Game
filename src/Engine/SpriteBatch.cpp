@@ -26,42 +26,22 @@ void SpriteBatch::begin(GlyphSortType sort_type)
 {
     _sort_type = sort_type;
     _render_batches.clear();
-    for(int i = 0; i < _glyphs.size(); i++)
-    {
-        delete _glyphs[i];
-    }
     _glyphs.clear();
 }
 
 void SpriteBatch::end()
 {
+    _glyph_pointers.resize(_glyphs.size());
+    for(int i = 0; i < _glyphs.size(); i++) {
+        _glyph_pointers[i] = &_glyphs[i];
+    }
     sort_glyphs();
     create_render_batches();
 }
 
 void SpriteBatch::draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, GLuint texture, float depth, const Color &color)
 {
-    Glyph *new_glyph = new Glyph;
-    new_glyph->texture = texture;
-    new_glyph->depth = depth;
-
-    new_glyph->top_left.set_color(color.r, color.g, color.b, color.a);
-    new_glyph->top_left.set_position(dest_rect.x, dest_rect.y + dest_rect.w, 0);
-    new_glyph->top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
-
-    new_glyph->top_right.set_color(color.r, color.g, color.b, color.a);
-    new_glyph->top_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y + dest_rect.w, 0);
-    new_glyph->top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
-
-    new_glyph->bottom_left.set_color(color.r, color.g, color.b, color.a);
-    new_glyph->bottom_left.set_position(dest_rect.x, dest_rect.y, 0);
-    new_glyph->bottom_left.set_uv(uv_rect.x, uv_rect.y);
-
-    new_glyph->bottom_right.set_color(color.r, color.g, color.b, color.a);
-    new_glyph->bottom_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y, 0);
-    new_glyph->bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
-
-    _glyphs.push_back(new_glyph);
+    _glyphs.emplace_back(dest_rect, uv_rect, texture, depth, color);
 }
 
 void SpriteBatch::render_batch()
@@ -80,40 +60,40 @@ void SpriteBatch::render_batch()
 void SpriteBatch::create_render_batches()
 {
     std::vector<Vertex> vertices;
-    vertices.resize(_glyphs.size() * 6);
+    vertices.resize(_glyph_pointers.size() * 6);
 
-    if(_glyphs.empty())
+    if(_glyph_pointers.empty())
         return;
 
     int offset = 0;
     int cur_vertex = 0;
 
-    _render_batches.emplace_back(offset, 6, _glyphs[0]->texture);
-    vertices[cur_vertex++] = _glyphs[0]->top_left;
-    vertices[cur_vertex++] = _glyphs[0]->bottom_left;
-    vertices[cur_vertex++] = _glyphs[0]->bottom_right;
-    vertices[cur_vertex++] = _glyphs[0]->bottom_right;
-    vertices[cur_vertex++] = _glyphs[0]->top_right;
-    vertices[cur_vertex++] = _glyphs[0]->top_left;
+    _render_batches.emplace_back(offset, 6, _glyph_pointers[0]->texture);
+    vertices[cur_vertex++] = _glyph_pointers[0]->top_left;
+    vertices[cur_vertex++] = _glyph_pointers[0]->bottom_left;
+    vertices[cur_vertex++] = _glyph_pointers[0]->bottom_right;
+    vertices[cur_vertex++] = _glyph_pointers[0]->bottom_right;
+    vertices[cur_vertex++] = _glyph_pointers[0]->top_right;
+    vertices[cur_vertex++] = _glyph_pointers[0]->top_left;
     offset += 6;
 
-    for(int cur_glyph = 1; cur_glyph < _glyphs.size(); cur_glyph++)
+    for(int cur_glyph = 1; cur_glyph < _glyph_pointers.size(); cur_glyph++)
     {
         // Only add new glyph if texture is different than previous
-        if(_glyphs[cur_glyph]->texture != _glyphs[cur_glyph-1]->texture)
+        if(_glyph_pointers[cur_glyph]->texture != _glyph_pointers[cur_glyph-1]->texture)
         {
-            _render_batches.emplace_back(offset, 6, _glyphs[cur_glyph]->texture);
+            _render_batches.emplace_back(offset, 6, _glyph_pointers[cur_glyph]->texture);
         }
         else
         {
             _render_batches.back().num_vertices += 6;
         }
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->top_left;
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->bottom_left;
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->bottom_right;
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->bottom_right;
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->top_right;
-        vertices[cur_vertex++] = _glyphs[cur_glyph]->top_left;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->top_left;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->bottom_left;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->bottom_right;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->bottom_right;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->top_right;
+        vertices[cur_vertex++] = _glyph_pointers[cur_glyph]->top_left;
         offset += 6;
     }
 
@@ -162,13 +142,13 @@ void SpriteBatch::sort_glyphs()
         case(GlyphSortType::NONE):
             break;
         case(GlyphSortType::BACK_TO_FRONT):
-            std::stable_sort(_glyphs.begin(), _glyphs.end(), compare_back_to_front);
+            std::stable_sort(_glyph_pointers.begin(), _glyph_pointers.end(), compare_back_to_front);
             break;
         case(GlyphSortType::FRONT_TO_BACK):
-            std::stable_sort(_glyphs.begin(), _glyphs.end(), compare_front_to_back);
+            std::stable_sort(_glyph_pointers.begin(), _glyph_pointers.end(), compare_front_to_back);
             break;
         case(GlyphSortType::TEXTURE):
-            std::stable_sort(_glyphs.begin(), _glyphs.end(), compare_texture);
+            std::stable_sort(_glyph_pointers.begin(), _glyph_pointers.end(), compare_texture);
             break;
     }
 }

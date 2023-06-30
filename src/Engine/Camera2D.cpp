@@ -47,4 +47,23 @@ glm::vec2 Camera2D::get_world_coords(glm::vec2 screen_coords)
     return screen_coords;
 }
 
+// AABB test to see if an entity is in the camera view
+bool Camera2D::is_in_view(const glm::vec2 &position, const glm::vec2 &dimensions)
+{
+    glm::vec2 scaled_screen_dimensions = glm::vec2(_screen_width, _screen_height) / _scale;
+
+    const float MIN_DISTANCE_X = dimensions.x / 2.0f + scaled_screen_dimensions.x / 2.0f;
+    const float MIN_DISTANCE_Y = dimensions.y / 2.0f + scaled_screen_dimensions.y / 2.0f;
+
+    glm::vec2 center_position = position + dimensions / 2.0f;
+    glm::vec2 center_camera_position = _position;
+    glm::vec2 distance_vector = center_position - center_camera_position;
+
+    float x_depth = MIN_DISTANCE_X - abs(distance_vector.x);
+    float y_depth = MIN_DISTANCE_Y - abs(distance_vector.y);
+
+    // If this is true we are colliding
+    return (x_depth > 0 && y_depth > 0);
+}
+
 
