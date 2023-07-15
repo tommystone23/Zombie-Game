@@ -17,7 +17,7 @@ public:
     void init(int speed, glm::vec2 position, InputManager *input_manager, Camera2D *camera, std::vector<Bullet> *bullets);
     virtual void update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
-                        float delta_time) override;
+                        float delta_time, AudioEngine &audio) override;
 
     void add_gun(Gun *gun);
 private:

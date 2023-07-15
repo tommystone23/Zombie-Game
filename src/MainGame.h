@@ -66,6 +66,8 @@ private:
     SpriteBatch _hud_sprite_batch;
     SpriteFont *_sprite_font;
 
+    AudioEngine _audio;
+
     Player *_player;
     std::vector<Level*> _levels;
     std::vector<Human*> _humans;

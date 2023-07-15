@@ -26,7 +26,7 @@ void Player::init(int speed, glm::vec2 position, InputManager *input_manager, Ca
 
 void Player::update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
-                        float delta_time)
+                        float delta_time, AudioEngine &audio)
 {
     if(_input_manager->is_key_pressed(SDLK_w))
         _position.y += _speed * delta_time;
@@ -53,7 +53,7 @@ void Player::update(const std::vector<std::string> &level_data,
         _guns[_cur_gun_index]->update(_input_manager->is_key_pressed(SDL_BUTTON_LEFT),
                                         player_center_position, 
                                         direction,
-                                        *_bullets, delta_time);
+                                        *_bullets, delta_time, audio);
     }
     
 

@@ -21,12 +21,13 @@ Gun::~Gun()
 
 void Gun::update(bool is_mouse_pressed, const glm::vec2& position, 
                 const glm::vec2& direction, std::vector<Bullet> &bullets,
-                float delta_time)
+                float delta_time, AudioEngine &audio)
 {
     _frame_counter += 1.0f * delta_time;
     if(_frame_counter >= _fire_rate && is_mouse_pressed) 
     {
         fire(direction, position, bullets);
+        emit_gun_sound(audio);
         _frame_counter = 0;
     }
 }
@@ -39,5 +40,22 @@ void Gun::fire(const glm::vec2& direction, const glm::vec2& position, std::vecto
     for(int i = 0; i < _bullets_per_shot; i++)
     {
         bullets.emplace_back(position, glm::rotate(direction, random_direction(random_engine)), _bullet_damage, _bullet_speed);
+    }
+}
+
+void Gun::emit_gun_sound(AudioEngine &audio)
+{
+    SoundEffect effect;
+    if(_name == "Pistol") {
+        effect = audio.load_sound_effect("sounds/shots/pistol.wav");
+        effect.play();
+    }
+    else if (_name == "Shotgun") {
+        effect = audio.load_sound_effect("sounds/shots/shotgun.wav");
+        effect.play();
+    }
+    else if(_name == "Machine-Gun") {
+        effect = audio.load_sound_effect("sounds/shots/cg1.wav");
+        effect.play();
     }
 }

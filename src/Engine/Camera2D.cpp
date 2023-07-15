@@ -25,7 +25,7 @@ void Camera2D::update()
         return;
     
     // Translate Camera
-    glm::vec3 translate(-_position.x + _screen_width/2, -_position.y + _screen_height/2, 0.0f);
+    glm::vec3 translate(-_position.x + _screen_width/2.0f, -_position.y + _screen_height/2.0f, 0.0f);
     _camera_matrix = glm::translate(_ortho_matrix, translate);
     // Scale Camera
     glm::vec3 scale(_scale, _scale, 0.0f);

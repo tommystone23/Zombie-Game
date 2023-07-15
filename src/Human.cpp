@@ -30,7 +30,7 @@ void Human::init(float speed, glm::vec2 position)
 
 void Human::update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
-                        float delta_time)
+                        float delta_time, AudioEngine &audio)
 {
     static std::mt19937 random_engine(time(nullptr));
     static std::uniform_real_distribution<float> random_rotate(-1.0f, 1.0f);

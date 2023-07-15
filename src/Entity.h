@@ -4,6 +4,7 @@
 #include "Engine/GLTexture.h"
 #include "Engine/SpriteBatch.h"
 #include <string>
+#include "Engine/AudioEngine.h"
 
 const float ENTITY_WIDTH = 60;
 const float ENTITY_RADIUS = ENTITY_WIDTH / 2.0f;
@@ -21,7 +22,7 @@ public:
     void draw(SpriteBatch &sprite_batch);
     virtual void update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
-                        float delta_time) = 0;
+                        float delta_time, AudioEngine &audio) = 0;
 
     bool handle_wall_collision(const std::vector<std::string> &level_data);
 

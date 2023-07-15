@@ -12,7 +12,7 @@ public:
 
     void update(bool is_mouse_pressed, const glm::vec2& position, 
                 const glm::vec2& direction, std::vector<Bullet> &bullets,
-                float delta_time);
+                float delta_time, AudioEngine &audio);
 private:
     std::string _name;
     int _fire_rate; // Fire rate in terms of frames
@@ -24,6 +24,7 @@ private:
     float _frame_counter;
 
     void fire(const glm::vec2& direction, const glm::vec2& position, std::vector<Bullet> &bullets);
+    void emit_gun_sound(AudioEngine &audio);
 };
 
 #endif

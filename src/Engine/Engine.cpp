@@ -9,5 +9,8 @@ int Engine::init()
         fatal_error("Failed to initialize SDL");
         return 0;
     }
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    
     return 0;
 }

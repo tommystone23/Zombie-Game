@@ -58,6 +58,7 @@ void MainGame::init_systems()
 {
     Engine::init();
     _window.create("Zombie Game", _screen_width, _screen_height, 0);
+    _audio.init();
     glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 }
 
@@ -159,12 +160,12 @@ void MainGame::update_entities(float delta_time)
     // Update humans
     for(int i = 0; i < _humans.size(); i++)
     {
-        _humans[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time);
+        _humans[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time, _audio);
     }
     // Update zombies
     for(int i = 0; i < _zombies.size(); i++)
     {
-        _zombies[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time);
+        _zombies[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time, _audio);
     }
 
     // Update human collisions

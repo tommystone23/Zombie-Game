@@ -39,15 +39,15 @@ Level::Level(const std::string &file_name)
             char tile = _level_data[y][x];
 
             // Get destination rectangle
-            glm::vec4 destRect(x * TILE_WIDTH, y * TILE_WIDTH, TILE_WIDTH, TILE_WIDTH);
+            glm::vec4 destRect((float)x * TILE_WIDTH, (float)y * TILE_WIDTH, TILE_WIDTH, TILE_WIDTH);
 
             switch(tile)
             {
                 case('B'):
-                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/brick_texture.png").id, 0.0f, color);
+                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/dungeon_wall.png").id, 0.0f, color);
                     break;
                 case('R'):
-                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/brick_texture.png").id, 0.0f, color);
+                    _sprite_batch.draw(destRect, uv_rect, ResourceManager::get_texture("textures/dungeon_wall.png").id, 0.0f, color);
                     break;
                 case('@'):
                     _level_data[y][x] = '.';

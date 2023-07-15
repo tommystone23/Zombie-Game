@@ -1,6 +1,6 @@
 C=g++
 CFLAGS=-Wall
-LDLIBS=-lGL -lGLEW -lSDL2 -lfreetype -std=c++11
+LDLIBS=-lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -std=c++11
 INCDIRS=-I../include
 
 PRGM=out

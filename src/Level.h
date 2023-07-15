@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 
 // Pixel width of each tile
-const int TILE_WIDTH = 64;
+const float TILE_WIDTH = 64;
 
 class Level
 {
