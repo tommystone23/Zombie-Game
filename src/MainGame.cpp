@@ -6,6 +6,8 @@
 #include <random>
 #include <ctime>
 #include "Gun.h"
+#include "Engine/ResourceManager.h"
+#include <glm/gtx/rotate_vector.hpp>
 
 
 const float HUMAN_SPEED = 1.0f;
@@ -49,6 +51,11 @@ void MainGame::run()
 
     _camera.init(_screen_width, _screen_height);
     _camera.set_scale(1.0f);
+
+    // Init particles
+    GLTexture texture = ResourceManager::get_texture("textures/blood.png");
+    _blood_particle_batch = new ParticleBatch2D(1000, 0.05f, texture);
+    _particle_engine.add_particle_batch(_blood_particle_batch);
 
     glEnable(GL_DEPTH_TEST);
     game_loop();
@@ -144,11 +151,13 @@ void MainGame::game_loop()
             float delta_time = std::min(total_delta_time, MAX_DELTA_TIME);
             update_entities(delta_time);
             update_bullets(delta_time);
+            _particle_engine.update(delta_time);
             total_delta_time -= delta_time;
         }
 
         _camera.set_position(_player->get_position());
         _camera.update();
+
         draw_game();
 
         _fps = fps.end();
@@ -235,6 +244,7 @@ void MainGame::update_bullets(float delta_time)
             // Check zombie collision
             if(_bullets[i].handle_entity_collision(_zombies[j]))
             {
+                add_blood(_zombies[j]->get_position(), 5);
                 // Damage zombie and kill if out of health
                 if(_zombies[j]->apply_damage(_bullets[i].get_damage()))
                 {
@@ -256,9 +266,10 @@ void MainGame::update_bullets(float delta_time)
         // Start loop at 1 so does not collide with player
         for(int j = 1; j < _humans.size();)
         {
-            // Check zombie collision
+            // Check human collision
             if(_bullets[i].handle_entity_collision(_humans[j]))
             {
+                add_blood(_humans[j]->get_position(), 5);
                 // Damage human and kill if out of health
                 if(_humans[j]->apply_damage(_bullets[i].get_damage()))
                 {
@@ -332,6 +343,8 @@ void MainGame::draw_game()
 
     _sprite_batch.begin();
 
+    _particle_engine.draw(_sprite_batch);
+
     const glm::vec2 entity_dimensions = glm::vec2(ENTITY_RADIUS * 2);
     // Draw Humans
     for(int i = 0; i < _humans.size(); i++) {
@@ -398,4 +411,16 @@ void MainGame::draw_hud()
 
     _hud_sprite_batch.end();
     _hud_sprite_batch.render_batch();
+}
+
+void MainGame::add_blood(const glm::vec2 &position, int num_particles)
+{
+    static std::mt19937 random_engine(time(nullptr));
+    static std::uniform_real_distribution<float> rand_angle(0.0f, 360.0f);
+
+    glm::vec2 velocity(1.0f, 0.0f);
+    Color color = { 255, 0, 0, 255 };
+    for(int i = 0; i < num_particles; i++) {
+        _blood_particle_batch->add_particle(position, glm::rotate(velocity, rand_angle(random_engine)), color, 5.0f);
+    }
 }

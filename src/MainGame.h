@@ -11,6 +11,8 @@
 #include "Player.h" 
 #include "Bullet.h"
 #include "Engine/SpriteFont.h"
+#include "Engine/ParticleEngine2D.h"
+#include "Engine/ParticleBatch2D.h"
 
 class Zombie;
 
@@ -47,6 +49,8 @@ private:
     void draw_hud();
     // Check if player won
     void check_victory();
+    // Adds blood to particle engine
+    void add_blood(const glm::vec2 &position, int num_particles);
 
     int _screen_width;
     int _screen_height;
@@ -65,6 +69,9 @@ private:
     SpriteBatch _sprite_batch;
     SpriteBatch _hud_sprite_batch;
     SpriteFont *_sprite_font;
+
+    ParticleEngine2D _particle_engine;
+    ParticleBatch2D *_blood_particle_batch;
 
     AudioEngine _audio;
 
