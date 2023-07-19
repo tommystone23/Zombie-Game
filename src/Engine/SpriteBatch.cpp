@@ -8,6 +8,78 @@ render_batch()
 #include "SpriteBatch.h"
 #include <algorithm>
 
+Glyph::Glyph(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+            GLuint _texture, float _depth, const Color &color)
+{
+    texture = _texture;
+    depth = _depth;
+
+    top_left.set_color(color.r, color.g, color.b, color.a);
+    top_left.set_position(dest_rect.x, dest_rect.y + dest_rect.w, 0);
+    top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
+
+    top_right.set_color(color.r, color.g, color.b, color.a);
+    top_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y + dest_rect.w, 0);
+    top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
+
+    bottom_left.set_color(color.r, color.g, color.b, color.a);
+    bottom_left.set_position(dest_rect.x, dest_rect.y, 0);
+    bottom_left.set_uv(uv_rect.x, uv_rect.y);
+
+    bottom_right.set_color(color.r, color.g, color.b, color.a);
+    bottom_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y, 0);
+    bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
+}
+
+Glyph::Glyph(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+            GLuint _texture, float _depth, const Color &color, float angle)
+{
+    // rotation math
+    glm::vec2 half_dimensions(dest_rect.z / 2.0f, dest_rect.w / 2.0f);
+
+    // 4 corners of tile around the centre point
+    glm::vec2 tl(-half_dimensions.x, half_dimensions.y);
+    glm::vec2 tr(half_dimensions.x, half_dimensions.y);
+    glm::vec2 bl(-half_dimensions.x, -half_dimensions.y);
+    glm::vec2 br(half_dimensions.x, -half_dimensions.y);
+
+    // Rotate points and add back half dimensions
+    tl = rotate_point(tl, angle) + half_dimensions;
+    tr = rotate_point(tr, angle) + half_dimensions;
+    bl = rotate_point(bl, angle) + half_dimensions;
+    br = rotate_point(br, angle) + half_dimensions;
+
+
+    texture = _texture;
+    depth = _depth;
+
+    top_left.set_color(color.r, color.g, color.b, color.a);
+    top_left.set_position(dest_rect.x + tl.x, dest_rect.y + tl.y, 0);
+    top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
+
+    top_right.set_color(color.r, color.g, color.b, color.a);
+    top_right.set_position(dest_rect.x + tr.x, dest_rect.y + tr.y, 0);
+    top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
+
+    bottom_left.set_color(color.r, color.g, color.b, color.a);
+    bottom_left.set_position(dest_rect.x + bl.x, dest_rect.y + bl.y, 0);
+    bottom_left.set_uv(uv_rect.x, uv_rect.y);
+
+    bottom_right.set_color(color.r, color.g, color.b, color.a);
+    bottom_right.set_position(dest_rect.x + br.x, dest_rect.y + br.y, 0);
+    bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
+}
+
+glm::vec2 Glyph::rotate_point(glm::vec2 point, float angle)
+{
+    glm::vec2 new_vector;
+    // Dot product rotation
+    new_vector.x = point.x * cos(angle) - point.y * sin(angle);
+    new_vector.y = point.x * sin(angle) + point.y * cos(angle);
+
+    return new_vector;
+}
+
 SpriteBatch::SpriteBatch() : _vbo(0), _vao(0)
 {
 }
@@ -39,9 +111,28 @@ void SpriteBatch::end()
     create_render_batches();
 }
 
-void SpriteBatch::draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, GLuint texture, float depth, const Color &color)
+void SpriteBatch::draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                        GLuint texture, float depth, const Color &color)
 {
     _glyphs.emplace_back(dest_rect, uv_rect, texture, depth, color);
+}
+
+void SpriteBatch::draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                        GLuint texture, float depth, const Color &color, float angle)
+{
+    _glyphs.emplace_back(dest_rect, uv_rect, texture, depth, color, angle);
+}
+
+void SpriteBatch::draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                        GLuint texture, float depth, const Color &color, const glm::vec2 direction)
+{
+    // Looking forward/down
+    const glm::vec2 default_direction(0.0f, -1.0f);
+    float angle = acos(glm::dot(default_direction, direction));
+    if(direction.x < 0.0f)
+        angle = -angle;
+
+    _glyphs.emplace_back(dest_rect, uv_rect, texture, depth, color, angle);
 }
 
 void SpriteBatch::render_batch()

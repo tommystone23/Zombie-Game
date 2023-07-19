@@ -20,27 +20,11 @@ public:
     Glyph(const glm::vec4 &dest_rect, 
         const glm::vec4 &uv_rect, 
         GLuint _texture, float _depth, 
-        const Color &color) 
-    {
-        texture = _texture;
-        depth = _depth;
-
-        top_left.set_color(color.r, color.g, color.b, color.a);
-        top_left.set_position(dest_rect.x, dest_rect.y + dest_rect.w, 0);
-        top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
-
-        top_right.set_color(color.r, color.g, color.b, color.a);
-        top_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y + dest_rect.w, 0);
-        top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
-
-        bottom_left.set_color(color.r, color.g, color.b, color.a);
-        bottom_left.set_position(dest_rect.x, dest_rect.y, 0);
-        bottom_left.set_uv(uv_rect.x, uv_rect.y);
-
-        bottom_right.set_color(color.r, color.g, color.b, color.a);
-        bottom_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y, 0);
-        bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
-    }
+        const Color &color);
+    Glyph(const glm::vec4 &dest_rect, 
+        const glm::vec4 &uv_rect, 
+        GLuint _texture, float _depth, 
+        const Color &color, float angle);
 
     GLuint texture;
     float depth;
@@ -49,6 +33,9 @@ public:
     Vertex bottom_left;
     Vertex top_right;
     Vertex bottom_right;
+
+private:
+    glm::vec2 rotate_point(glm::vec2 point, float angle);
 };
 
 class RenderBatch
@@ -72,7 +59,12 @@ public:
     void begin(GlyphSortType sort_type = GlyphSortType::TEXTURE);
     void end();
 
-    void draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, GLuint texture, float depth, const Color &color);
+    void draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                GLuint texture, float depth, const Color &color);
+    void draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                GLuint texture, float depth, const Color &color, float angle);
+    void draw(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect, 
+                GLuint texture, float depth, const Color &color, const glm::vec2 direction);
     void render_batch();
 private:
     GLuint _vbo;
