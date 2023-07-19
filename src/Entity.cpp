@@ -5,6 +5,7 @@
 
 Entity::Entity()
 {
+    _direction = glm::vec2(0.0f, 1.0f);
 }
 
 Entity::~Entity()
@@ -13,34 +14,32 @@ Entity::~Entity()
 
 void Entity::draw(SpriteBatch &sprite_batch)
 {
-    static GLuint texture_id = ResourceManager::get_texture("textures/CharacterLeft_Standing.png").id;
-
     // Texture coords will always be the same.
     const glm::vec4 uv_rect(0.0f, 0.0f, 1.0f, 1.0f);
 
     glm::vec4 dest_rect(_position.x, _position.y, ENTITY_WIDTH, ENTITY_WIDTH);
-    sprite_batch.draw(dest_rect, uv_rect, texture_id, 0, _color);
+    sprite_batch.draw(dest_rect, uv_rect, _texture_id, 0, _color, _direction);
 }
 
 bool Entity::handle_wall_collision(const std::vector<std::string> &level_data)
 {
-    std::vector<glm::vec2> collide_wall_positon;
+    std::vector<glm::vec2> collide_wall_position;
 
     // Check 4 corners
     // First corner
-    check_wall_position(level_data, collide_wall_positon, _position.x, _position.y);
+    check_wall_position(level_data, collide_wall_position, _position.x, _position.y);
     //Second corner
-    check_wall_position(level_data, collide_wall_positon, _position.x + ENTITY_WIDTH, _position.y);
+    check_wall_position(level_data, collide_wall_position, _position.x + ENTITY_WIDTH, _position.y);
     // Third corner
-    check_wall_position(level_data, collide_wall_positon, _position.x, _position.y + ENTITY_WIDTH);
+    check_wall_position(level_data, collide_wall_position, _position.x, _position.y + ENTITY_WIDTH);
     // Fourth corner
-    check_wall_position(level_data, collide_wall_positon, _position.x + ENTITY_WIDTH, _position.y + ENTITY_WIDTH);
+    check_wall_position(level_data, collide_wall_position, _position.x + ENTITY_WIDTH, _position.y + ENTITY_WIDTH);
 
-    if(collide_wall_positon.size() == 0)
+    if(collide_wall_position.size() == 0)
         return false;
 
-    for(int i = 0; i < collide_wall_positon.size(); i++){
-        collide_with_wall(collide_wall_positon[i]);
+    for(int i = 0; i < collide_wall_position.size(); i++){
+        collide_with_wall(collide_wall_position[i]);
     }
     return true;
 }
@@ -81,10 +80,10 @@ bool Entity::apply_damage(float damage)
 }
 
 void Entity::check_wall_position(const std::vector<std::string> &level_data, 
-            std::vector<glm::vec2> &collide_wall_positon, float x, float y)
+            std::vector<glm::vec2> &collide_wall_position, float x, float y)
 {
-    glm::vec2 corner_pos = glm::vec2(floor(x / (float)TILE_WIDTH), 
-                                        floor(y / (float)TILE_WIDTH));
+    glm::vec2 corner_pos(std::floor(x / TILE_WIDTH), 
+                            std::floor(y / TILE_WIDTH));
     
     // Check if entity is outside map or inside wall
     if(corner_pos.x < 0 || corner_pos.x >= level_data[0].size() ||
@@ -93,9 +92,14 @@ void Entity::check_wall_position(const std::vector<std::string> &level_data,
             return;
         }
 
+    // Weird bug where position becomes NaN
+    if(isnan(_position.x) || isnan(_position.y))
+        return;
+
+
     // Check if collideable
     if(level_data[corner_pos.y][corner_pos.x] != '.'){
-        collide_wall_positon.push_back(corner_pos  * (float)TILE_WIDTH + glm::vec2((float)TILE_WIDTH / 2.0f));
+        collide_wall_position.push_back(corner_pos  * TILE_WIDTH + glm::vec2(TILE_WIDTH / 2.0f));
     }
 }
 

@@ -35,12 +35,14 @@ public:
 
 protected:
     glm::vec2 _position;
+    glm::vec2 _direction;
     float _speed;
     Color _color;
     float _health;
+    GLuint _texture_id;
 
     void check_wall_position(const std::vector<std::string> &level_data, 
-                std::vector<glm::vec2> &collide_tile_positon, float x, float y);
+                std::vector<glm::vec2> &collide_tile_position, float x, float y);
     void collide_with_wall(glm::vec2 tile_pos);
 };
 

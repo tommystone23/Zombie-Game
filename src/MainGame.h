@@ -68,6 +68,7 @@ private:
 
     SpriteBatch _sprite_batch;
     SpriteBatch _hud_sprite_batch;
+    SpriteBatch _particle_sprite_batch;
     SpriteFont *_sprite_font;
 
     ParticleEngine2D _particle_engine;

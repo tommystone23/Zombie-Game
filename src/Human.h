@@ -15,9 +15,6 @@ public:
     virtual void update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
                         float delta_time, AudioEngine &audio) override;
-
-private:
-    glm::vec2 _direction;
 };
 
 #endif

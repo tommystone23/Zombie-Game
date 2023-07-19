@@ -16,7 +16,13 @@ const float PLAYER_SPEED = 3.0f;
 const int FONT_SIZE = 64;
 const float FONT_SCALE = 1.0f;
 
-MainGame::MainGame() : _screen_width(1920), _screen_height(1080), _game_state(GameState::PLAY), _player(NULL), _fps(0)
+MainGame::MainGame() 
+    : _screen_width(1920),
+    _screen_height(1080), 
+    _game_state(GameState::PLAY), 
+    _player(NULL), 
+    _fps(0),
+    _cur_level(0)
 {
 }
 
@@ -46,6 +52,7 @@ void MainGame::run()
 
     _sprite_batch.init();
     _hud_sprite_batch.init();
+    _particle_sprite_batch.init();
 
     _sprite_font = new SpriteFont("fonts/OpenSans-Regular.ttf", FONT_SIZE);
 
@@ -54,10 +61,16 @@ void MainGame::run()
 
     // Init particles
     GLTexture texture = ResourceManager::get_texture("textures/blood.png");
-    _blood_particle_batch = new ParticleBatch2D(1000, 0.05f, texture);
+    _blood_particle_batch = new ParticleBatch2D(1000, 0.05f, texture,
+                            [](Particle &particle, float delta_time, float decay_rate) {
+                                particle.position += particle.velocity * delta_time;
+                                particle.life_time -= decay_rate * delta_time;
+                                // Add fade to particles
+                                particle.color.a = (GLubyte)(particle.life_time * 255.0f);
+                            });
     _particle_engine.add_particle_batch(_blood_particle_batch);
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     game_loop();
 }
 
@@ -84,12 +97,30 @@ void MainGame::init_level()
     std::uniform_int_distribution<int> rand_xpos(1, _levels[_cur_level]->get_level_width() - 2);
     std::uniform_int_distribution<int> rand_ypos(1, _levels[_cur_level]->get_level_height() - 2);
 
+
+    int num_humans = _levels[_cur_level]->get_num_humans();
+    glm::vec2 positions[num_humans];
+    memset(positions, 0, sizeof(glm::vec2) * num_humans);
+
     // Add all random humans
-    for(int i = 0; i < _levels[_cur_level]->get_num_humans(); i++)
+    for(int i = 0; i < num_humans; i++)
     {
-        _humans.push_back(new Human);
-        glm::vec2 position(rand_xpos(random_engine) * TILE_WIDTH, rand_ypos(random_engine) * TILE_WIDTH);
-        _humans.back()->init(HUMAN_SPEED, position);
+        Human *human = new Human;
+        do {
+            glm::vec2 position((float)rand_xpos(random_engine) * TILE_WIDTH, (float)rand_ypos(random_engine) * TILE_WIDTH);
+            human->init(HUMAN_SPEED, position);
+            // Make sure humans are not spawned on top of eachother
+            if(std::find(positions, positions + num_humans, position) != positions + num_humans) {
+                continue;
+            }
+            // Make sure humans are not spawned on walls
+            if(!human->handle_wall_collision(_levels[_cur_level]->get_level_data()))
+                break;
+
+            positions[i] = position;
+        } while(true);
+
+        _humans.push_back(human);
     }
 
     // Add zombie(s)
@@ -339,11 +370,14 @@ void MainGame::draw_game()
     GLint projection_location = _shader_program.get_uniform_location("projection");
     glUniformMatrix4fv(projection_location, 1, GL_FALSE, &projection[0][0]);
 
+    // Draw the level
+    _levels[_cur_level]->draw();
+
     draw_hud();
 
     _sprite_batch.begin();
 
-    _particle_engine.draw(_sprite_batch);
+    _particle_engine.draw(_particle_sprite_batch);
 
     const glm::vec2 entity_dimensions = glm::vec2(ENTITY_RADIUS * 2);
     // Draw Humans
@@ -362,9 +396,6 @@ void MainGame::draw_game()
 
     _sprite_batch.end();
     _sprite_batch.render_batch();
-
-    // Draw the level
-    _levels[_cur_level]->draw();
 
     _shader_program.unuse();
     _window.swap_buffers();
@@ -419,7 +450,7 @@ void MainGame::add_blood(const glm::vec2 &position, int num_particles)
     static std::uniform_real_distribution<float> rand_angle(0.0f, 360.0f);
 
     glm::vec2 velocity(1.0f, 0.0f);
-    Color color = { 255, 0, 0, 255 };
+    Color color = { 255, 255, 255, 255 };
     for(int i = 0; i < num_particles; i++) {
         _blood_particle_batch->add_particle(position, glm::rotate(velocity, rand_angle(random_engine)), color, 5.0f);
     }
