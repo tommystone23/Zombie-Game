@@ -373,8 +373,6 @@ void MainGame::draw_game()
     // Draw the level
     _levels[_cur_level]->draw();
 
-    draw_hud();
-
     _sprite_batch.begin();
 
     _particle_engine.draw(_particle_sprite_batch);
@@ -393,6 +391,8 @@ void MainGame::draw_game()
     // Draw bullets
     for(int i = 0; i < _bullets.size(); i++)
         _bullets[i].draw(_sprite_batch);
+
+    draw_hud();
 
     _sprite_batch.end();
     _sprite_batch.render_batch();

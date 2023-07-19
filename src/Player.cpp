@@ -22,6 +22,8 @@ void Player::init(int speed, glm::vec2 position, InputManager *input_manager, Ca
     _bullets = bullets;
     _health = 150;
     _texture_id = ResourceManager::get_texture("textures/player.png").id;
+    // Default direction is looking down
+    _direction = glm::vec2(0.0f, -1.0f);
 
     _color = { 255, 255, 255, 255 };
 }
@@ -30,14 +32,18 @@ void Player::update(const std::vector<std::string> &level_data,
                         std::vector<Human*> &humans, std::vector<Zombie*> &zombies,
                         float delta_time, AudioEngine &audio)
 {
+    glm::vec2 movement_direction(0.0f);
     if(_input_manager->is_key_pressed(SDLK_w))
-        _position.y += _speed * delta_time;
+        movement_direction.y += 1;
     if(_input_manager->is_key_pressed(SDLK_s))
-        _position.y -= _speed * delta_time;
+        movement_direction.y -= 1;
     if(_input_manager->is_key_pressed(SDLK_a))
-        _position.x -= _speed * delta_time;
+        movement_direction.x -= 1;
     if(_input_manager->is_key_pressed(SDLK_d))
-        _position.x += _speed * delta_time;
+        movement_direction.x += 1;
+
+    if(glm::length(movement_direction))
+        _position += glm::normalize(movement_direction) * _speed * delta_time;
 
     if(_input_manager->is_key_pressed(SDLK_1) && _guns.size() >= 0)
         _cur_gun_index = 0;
