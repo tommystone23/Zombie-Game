@@ -9,7 +9,7 @@ Player::Player() : _cur_gun_index(-1)
 
 Player::~Player()
 {
-    for(int i = 0; i < _guns.size(); i++)
+    for(size_t i = 0; i < _guns.size(); i++)
         delete _guns[i];
 }
 

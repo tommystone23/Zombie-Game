@@ -43,7 +43,7 @@ Human* Zombie::get_nearest_human(std::vector<Human*> &humans)
     // Arbitrarily large value to start
     float smallest_distance = 9999999.0f;
 
-    for(int i = 0; i < humans.size(); i++)
+    for(size_t i = 0; i < humans.size(); i++)
     {
         glm::vec2 distance_vector = humans[i]->get_position() - _position;
         float distance = glm::length(distance_vector);

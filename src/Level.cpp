@@ -32,9 +32,9 @@ Level::Level(const std::string &file_name)
     //glm::vec4 uv_rect(0.0625f, 0.0625f, 0.9375f, 0.9375f);
     Color color = { 255, 255, 255, 255};
 
-    for(int y = 0; y < _level_data.size();y++)
+    for(size_t y = 0; y < _level_data.size();y++)
     {
-        for(int x = 0; x < _level_data[y].size(); x++)
+        for(size_t x = 0; x < _level_data[y].size(); x++)
         {
             char tile = _level_data[y][x];
 

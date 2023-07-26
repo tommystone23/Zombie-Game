@@ -125,7 +125,7 @@ void MainGame::init_level()
 
     // Add zombie(s)
     const std::vector<glm::vec2>& zombie_positions = _levels[_cur_level]->get_zombie_start_position();
-    for(int i = 0; i < zombie_positions.size(); i++)
+    for(size_t i = 0; i < zombie_positions.size(); i++)
     {
         _zombies.push_back(new Zombie);
         _zombies.back()->init(ZOMBIE_SPEED, zombie_positions[i]);
@@ -198,35 +198,35 @@ void MainGame::game_loop()
 void MainGame::update_entities(float delta_time)
 {
     // Update humans
-    for(int i = 0; i < _humans.size(); i++)
+    for(size_t i = 0; i < _humans.size(); i++)
     {
         _humans[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time, _audio);
     }
     // Update zombies
-    for(int i = 0; i < _zombies.size(); i++)
+    for(size_t i = 0; i < _zombies.size(); i++)
     {
         _zombies[i]->update(_levels[_cur_level]->get_level_data(), _humans, _zombies, delta_time, _audio);
     }
 
     // Update human collisions
-    for(int i = 0; i < _humans.size(); i++)
+    for(size_t i = 0; i < _humans.size(); i++)
     {
-        for(int j = i + 1; j < _humans.size(); j++)
+        for(size_t j = i + 1; j < _humans.size(); j++)
         {
             _humans[i]->handle_entity_collision(_humans[j]);
         }
     }
 
     // Update zombie collisions
-    for(int i = 0; i < _zombies.size(); i++)
+    for(size_t i = 0; i < _zombies.size(); i++)
     {
         // Zombie to zombie collision
-        for(int j = i + 1; j < _zombies.size(); j++)
+        for(size_t j = i + 1; j < _zombies.size(); j++)
         {
             _zombies[i]->handle_entity_collision(_zombies[j]);
         }
         // Zombie to human collision
-        for(int j = 1; j < _humans.size(); j++)
+        for(size_t j = 1; j < _humans.size(); j++)
         {
             if(_zombies[i]->handle_entity_collision(_humans[j]))
             {
@@ -251,7 +251,7 @@ void MainGame::update_entities(float delta_time)
 void MainGame::update_bullets(float delta_time)
 {
     // Collide with world
-    for(int i = 0; i < _bullets.size();)
+    for(size_t i = 0; i < _bullets.size();)
     {
         // If true. collided with wall
         if(_bullets[i].update(_levels[_cur_level]->get_level_data(), delta_time))
@@ -266,11 +266,11 @@ void MainGame::update_bullets(float delta_time)
     }
 
     // Collide with humans and zomies
-    for(int i = 0; i < _bullets.size(); i++)
+    for(size_t i = 0; i < _bullets.size(); i++)
     {
         bool has_collided = false;
         // Zombies
-        for(int j = 0; j < _zombies.size();)
+        for(size_t j = 0; j < _zombies.size();)
         {
             // Check zombie collision
             if(_bullets[i].handle_entity_collision(_zombies[j]))
@@ -295,7 +295,7 @@ void MainGame::update_bullets(float delta_time)
         if(has_collided)
             continue;
         // Start loop at 1 so does not collide with player
-        for(int j = 1; j < _humans.size();)
+        for(size_t j = 1; j < _humans.size();)
         {
             // Check human collision
             if(_bullets[i].handle_entity_collision(_humans[j]))
@@ -379,17 +379,17 @@ void MainGame::draw_game()
 
     const glm::vec2 entity_dimensions = glm::vec2(ENTITY_RADIUS * 2);
     // Draw Humans
-    for(int i = 0; i < _humans.size(); i++) {
+    for(size_t i = 0; i < _humans.size(); i++) {
         if(_camera.is_in_view(_humans[i]->get_position(), entity_dimensions))
             _humans[i]->draw(_sprite_batch);
     }
     // Draw zombies
-    for(int i = 0; i < _zombies.size(); i++) {
+    for(size_t i = 0; i < _zombies.size(); i++) {
         if(_camera.is_in_view(_zombies[i]->get_position(), entity_dimensions))
             _zombies[i]->draw(_sprite_batch);
     }
     // Draw bullets
-    for(int i = 0; i < _bullets.size(); i++)
+    for(size_t i = 0; i < _bullets.size(); i++)
         _bullets[i].draw(_sprite_batch);
 
     draw_hud();

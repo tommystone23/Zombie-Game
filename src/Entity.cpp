@@ -38,7 +38,7 @@ bool Entity::handle_wall_collision(const std::vector<std::string> &level_data)
     if(collide_wall_position.size() == 0)
         return false;
 
-    for(int i = 0; i < collide_wall_position.size(); i++){
+    for(size_t i = 0; i < collide_wall_position.size(); i++){
         collide_with_wall(collide_wall_position[i]);
     }
     return true;
