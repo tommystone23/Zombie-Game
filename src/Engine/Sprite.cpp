@@ -33,28 +33,28 @@ void Sprite::init(float x, float y, float width, float height, std::string textu
     // Use Vertex struct for each vertex
     Vertex vertices[6];
     // First triangle
-    vertices[0].set_position(x, y, 0.0f);
+    vertices[0].set_position(x, y);
     vertices[0].set_color(0, 255, 255, 255);
     vertices[0].set_uv(0.0f, 0.0f);
 
-    vertices[1].set_position(x, (y+height), 0.0f);
+    vertices[1].set_position(x, (y+height));
     vertices[1].set_color(0, 255, 255, 255);
     vertices[1].set_uv(0.0f, 1.0f);
 
-    vertices[2].set_position((x+width), (y+height), 0.0f);
+    vertices[2].set_position((x+width), (y+height));
     vertices[2].set_color(0, 255, 255, 255);
     vertices[2].set_uv(1.0f, 1.0f);
 
     // Second Triangle
-    vertices[3].set_position(x, y, 0.0f);
+    vertices[3].set_position(x, y);
     vertices[3].set_color(0, 255, 255, 255);
     vertices[3].set_uv(0.0f, 0.0f);
 
-    vertices[4].set_position((x+width), y, 0.0f);
+    vertices[4].set_position((x+width), y);
     vertices[4].set_color(0, 255, 255, 255);
     vertices[4].set_uv(1.0f, 0.0f);
 
-    vertices[5].set_position((x+width), (y+height), 0.0f);
+    vertices[5].set_position((x+width), (y+height));
     vertices[5].set_color(0, 255, 255, 255);
     vertices[5].set_uv(1.0f, 1.0f);
 

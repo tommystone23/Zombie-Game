@@ -15,19 +15,19 @@ Glyph::Glyph(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect,
     depth = _depth;
 
     top_left.set_color(color.r, color.g, color.b, color.a);
-    top_left.set_position(dest_rect.x, dest_rect.y + dest_rect.w, 0);
+    top_left.set_position(dest_rect.x, dest_rect.y + dest_rect.w);
     top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
 
     top_right.set_color(color.r, color.g, color.b, color.a);
-    top_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y + dest_rect.w, 0);
+    top_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y + dest_rect.w);
     top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
 
     bottom_left.set_color(color.r, color.g, color.b, color.a);
-    bottom_left.set_position(dest_rect.x, dest_rect.y, 0);
+    bottom_left.set_position(dest_rect.x, dest_rect.y);
     bottom_left.set_uv(uv_rect.x, uv_rect.y);
 
     bottom_right.set_color(color.r, color.g, color.b, color.a);
-    bottom_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y, 0);
+    bottom_right.set_position(dest_rect.x + dest_rect.z, dest_rect.y);
     bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
 }
 
@@ -54,19 +54,19 @@ Glyph::Glyph(const glm::vec4 &dest_rect, const glm::vec4 &uv_rect,
     depth = _depth;
 
     top_left.set_color(color.r, color.g, color.b, color.a);
-    top_left.set_position(dest_rect.x + tl.x, dest_rect.y + tl.y, 0);
+    top_left.set_position(dest_rect.x + tl.x, dest_rect.y + tl.y);
     top_left.set_uv(uv_rect.x, uv_rect.y + uv_rect.w);
 
     top_right.set_color(color.r, color.g, color.b, color.a);
-    top_right.set_position(dest_rect.x + tr.x, dest_rect.y + tr.y, 0);
+    top_right.set_position(dest_rect.x + tr.x, dest_rect.y + tr.y);
     top_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y + uv_rect.w);
 
     bottom_left.set_color(color.r, color.g, color.b, color.a);
-    bottom_left.set_position(dest_rect.x + bl.x, dest_rect.y + bl.y, 0);
+    bottom_left.set_position(dest_rect.x + bl.x, dest_rect.y + bl.y);
     bottom_left.set_uv(uv_rect.x, uv_rect.y);
 
     bottom_right.set_color(color.r, color.g, color.b, color.a);
-    bottom_right.set_position(dest_rect.x + br.x, dest_rect.y + br.y, 0);
+    bottom_right.set_position(dest_rect.x + br.x, dest_rect.y + br.y);
     bottom_right.set_uv(uv_rect.x + uv_rect.z, uv_rect.y);
 }
 
@@ -104,7 +104,7 @@ void SpriteBatch::begin(GlyphSortType sort_type)
 void SpriteBatch::end()
 {
     _glyph_pointers.resize(_glyphs.size());
-    for(int i = 0; i < _glyphs.size(); i++) {
+    for(size_t i = 0; i < _glyphs.size(); i++) {
         _glyph_pointers[i] = &_glyphs[i];
     }
     sort_glyphs();
@@ -139,7 +139,7 @@ void SpriteBatch::render_batch()
 {
     glBindVertexArray(_vao);
 
-    for(int i = 0; i < _render_batches.size(); i++)
+    for(size_t i = 0; i < _render_batches.size(); i++)
     {
         glBindTexture(GL_TEXTURE_2D, _render_batches[i].texture);
         glDrawArrays(GL_TRIANGLES, _render_batches[i].offset, _render_batches[i].num_vertices);
@@ -168,7 +168,7 @@ void SpriteBatch::create_render_batches()
     vertices[cur_vertex++] = _glyph_pointers[0]->top_left;
     offset += 6;
 
-    for(int cur_glyph = 1; cur_glyph < _glyph_pointers.size(); cur_glyph++)
+    for(size_t cur_glyph = 1; cur_glyph < _glyph_pointers.size(); cur_glyph++)
     {
         // Only add new glyph if texture is different than previous
         if(_glyph_pointers[cur_glyph]->texture != _glyph_pointers[cur_glyph-1]->texture)
